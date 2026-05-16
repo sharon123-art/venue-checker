@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -189,14 +189,13 @@
     </div>
 
     <script>
+        const API_BASE = 'https://venue-checker-nad3.onrender.com/api';
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        
-        if (!token) {
+         if (!token) {
             window.location.href = 'login.html';
-}
+        }
         
-        // Show admin panel link ONLY for admin users
         if (user.role === 'admin') {
             const headerDiv = document.querySelector('.header div:last-child');
             const adminBtn = document.createElement('a');
@@ -213,7 +212,7 @@
         
         async function loadVenues() {
             try {
-                const response = await fetch('http://localhost:5000/api/venues', {
+                const response = await fetch(`${API_BASE}/venues`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await response.json();
@@ -247,7 +246,6 @@
                 return;
             }
             
-            // Get current logged-in user
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
             const currentUserName = currentUser.name || '';
             const userRole = currentUser.role || '';
@@ -273,21 +271,19 @@
                     }
                     
                     html += '<div class="action-buttons">';
-                    
                     const isBooker = v.occupiedBy && v.occupiedBy.includes(currentUserName);
-                     if (isBooker && userRole === 'class_rep') {
+                    
+                    if (isBooker && userRole === 'class_rep') {
                         html += '<button class="btn-empty" onclick="markEmpty(\'' + v._id + '\')">✅ Mark Empty (Class Ended Early)</button>';
-                    } else {
+                     } else {
                         html += '<button disabled style="background:#ccc; cursor:not-allowed;">❌ Booked by another class rep</button>';
                     }
                     html += '</div>';
                     
                 } else {
-
                     html += '🟢 EMPTY</span>';
                     html += '<div class="action-buttons">';
                     
-                    // ONLY class reps can book venues (ADMIN cannot book)
                     if (userRole === 'class_rep') {
                         html += '<button class="btn-occupy" onclick="bookVenue(\'' + v._id + '\', \'' + v.name + '\')">📖 Book Venue</button>';
                     } else {
@@ -307,19 +303,9 @@
             const statusFilter = document.getElementById('statusFilter').value;
             
             let filtered = [...allVenues];
-            
-            if (searchTerm) {
-                filtered = filtered.filter(v => v.name.toLowerCase().includes(searchTerm));
-            }
-            
-            if (buildingFilter) {
-                filtered = filtered.filter(v => v.building === buildingFilter);
-            }
-            
-            if (statusFilter) {
-                filtered = filtered.filter(v => v.status === statusFilter);
-            }
-            
+            if (searchTerm) filtered = filtered.filter(v => v.name.toLowerCase().includes(searchTerm));
+            if (buildingFilter) filtered = filtered.filter(v => v.building === buildingFilter);
+            if (statusFilter) filtered = filtered.filter(v => v.status === statusFilter);
             displayVenues(filtered);
         }
         
@@ -333,50 +319,43 @@
         async function bookVenue(id, name) {
             const hours = prompt('How many hours will you use ' + name + '? (Default: 3)', '3');
             if (!hours) return;
-            
             const className = prompt('Enter your class name:', 'Class Rep');
             if (!className) return;
-            
-            // Get current user's name
             const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
             const bookerName = currentUser.name || 'Class Rep';
             
             try {
-                const response = await fetch('http://localhost:5000/api/venues/' + id + '/occupy', {
+                const response = await fetch(`${API_BASE}/venues/${id}/occupy`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
-                    body: JSON.stringify({ 
-                        durationHours: parseInt(hours), 
-                        className: className,
-                        bookerName: bookerName
-                    })
+                    body: JSON.stringify({ durationHours: parseInt(hours), className: className, bookerName: bookerName })
                 });
                 const data = await response.json();
                 if (data.success) {
                     alert('✅ Venue booked successfully for ' + hours + ' hours!');
                     loadVenues();
                 } else {
-                    alert('❌ Error: ' + data.message); }
+                    alert('❌ Error: ' + data.message);
+                }
             } catch (error) {
                 alert('❌ Error booking venue: ' + error.message);
             }
         }
         
         async function markEmpty(id) {
-            if (!confirm('⚠️ Are you sure you want to mark this venue as EMPTY? (Class ended early)')) return;
-            
+            if (!confirm('⚠️ Are you sure you want to mark this venue as EMPTY?')) return;
             try {
-                const response = await fetch('http://localhost:5000/api/venues/' + id + '/empty', { 
+                const response = await fetch(`${API_BASE}/venues/${id}/empty`, {
                     method: 'POST',
                     headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
                 });
                 const data = await response.json();
                 if (data.success) {
                     alert('✅ Venue marked as empty!');
-                    loadVenues();
+                     loadVenues();
                 } else {
                     alert('❌ Error: ' + data.message);
                 }

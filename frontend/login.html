@@ -59,6 +59,8 @@
     </div>
 
     <script>
+        const API_URL = 'https://venue-checker-nad3.onrender.com/api/auth/login';
+        
         async function login() {
             const regNo = document.getElementById('regNo').value;
             const password = document.getElementById('password').value;
@@ -71,7 +73,7 @@
             }
             
             try {
-                const response = await fetch('http://localhost:5000/api/auth/login', {
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ regNo, password })

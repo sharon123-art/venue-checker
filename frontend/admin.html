@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -97,7 +97,9 @@
     </div>
 
     <script>
+        const API_BASE = 'https://venue-checker-nad3.onrender.com/api';
         const token = localStorage.getItem('token');
+        
         if (!token) {
             window.location.href = 'login.html';
         }
@@ -107,17 +109,16 @@
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
             const messageDiv = document.getElementById('message');
             
             if (!regNo || !name || !email || !password) {
                 messageDiv.className = 'message error';
                 messageDiv.innerHTML = 'Please fill all fields';
-                 return;
+                return;
             }
             
             try {
-                const response = await fetch('http://localhost:5000/api/auth/register', {
+                const response = await fetch(`${API_BASE}/auth/register`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -125,7 +126,6 @@
                     },
                     body: JSON.stringify({ regNo, name, email, password })
                 });
-                
                 const data = await response.json();
                 
                 if (data.success) {
@@ -152,21 +152,21 @@
         
         async function loadReps() {
             try {
-                const response = await fetch('http://localhost:5000/api/auth/class-reps', {
+                const response = await fetch(`${API_BASE}/auth/class-reps`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await response.json();
                 
                 if (data.success && data.data && data.data.length > 0) {
-                    let html = '<table><th>Reg No</th><th>Name</th><th>Email</th><th>Action</th></tr>';
+                    let html = '<tr><th>Reg No</th><th>Name</th><th>Email</th><th>Action</th></tr>';
                     for (let i = 0; i < data.data.length; i++) {
                         const rep = data.data[i];
-                        html += '<tr>';
-                        html += '<td>' + rep.regNo + '</td>';
-                        html += '<td>' + rep.name + '</td>';
-                        html += '<td>' + rep.email + '</td>';
-                        html += '<td><button class="danger" onclick="deleteRep(\'' + rep._id + '\')">Delete</button></td>';
-                        html += '</tr>';
+                        html += <tr>
+                            <td>${rep.regNo}</td>
+                            <td>${rep.name}</td>
+                            <td>${rep.email}</td>
+                            <td><button class="danger" onclick="deleteRep('${rep._id}')">Delete</button></td>
+                        </tr>;
                     }
                     html += '</table>';
                     document.getElementById('repsList').innerHTML = html;
@@ -181,7 +181,7 @@
         async function deleteRep(id) {
             if (confirm('Delete this class rep?')) {
                 try {
-                    await fetch('http://localhost:5000/api/auth/class-reps/' + id, {
+                    await fetch(`${API_BASE}/auth/class-reps/${id}`, {
                         method: 'DELETE',
                         headers: { 'Authorization': 'Bearer ' + token }
                     });
