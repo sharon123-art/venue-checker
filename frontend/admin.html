@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - VenueChecker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        h2 { margin-bottom: 20px; color: #333; }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button.danger { background: #e53e3e; }
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .message.success { background: #c6f6d5; color: #22543d; display: block; }
+        .message.error { background: #fed7d7; color: #742a2a; display: block; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th { background: #f5f5f5; }
+        .logout { background: #e53e3e; margin-left: 10px; }
+        .back-btn { background: #718096; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Admin Panel</h1>
+                <p>Register Class Representatives</p>
+            </div>
+            <div>
+                <button class="back-btn" onclick="goToDashboard()">Dashboard</button>
+                <button class="logout" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Register New Class Rep</h2>
+            <div id="message"></div>
+            <input type="text" id="regNo" placeholder="Registration Number (e.g., CI/001/23)">
+            <input type="text" id="name" placeholder="Full Name">
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="registerRep()">Register Class Rep</button>
+        </div>
+
+        <div class="card">
+            <h2>Registered Class Reps</h2>
+            <div id="repsList">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        async function registerRep() {
+            const regNo = document.getElementById('regNo').value;
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            const messageDiv = document.getElementById('message');
+            
+            if (!regNo || !name || !email || !password) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = 'Please fill all fields';
+                 return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ regNo, name, email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.className = 'message success';
+                    messageDiv.innerHTML = 'Class rep registered successfully!';
+                    document.getElementById('regNo').value = '';
+                    document.getElementById('name').value = '';
+                    document.getElementById('email').value = '';
+                    document.getElementById('password').value = '';
+                    loadReps();
+                    setTimeout(() => {
+                        messageDiv.className = 'message';
+                        messageDiv.innerHTML = '';
+                    }, 3000);
+                } else {
+                    messageDiv.className = 'message error';
+                    messageDiv.innerHTML = data.message || 'Registration failed';
+                }
+            } catch (error) {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = 'Error connecting to server';
+            }
+        }
+        
+        async function loadReps() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/class-reps', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    let html = '<table><th>Reg No</th><th>Name</th><th>Email</th><th>Action</th></tr>';
+                    for (let i = 0; i < data.data.length; i++) {
+                        const rep = data.data[i];
+                        html += '<tr>';
+                        html += '<td>' + rep.regNo + '</td>';
+                        html += '<td>' + rep.name + '</td>';
+                        html += '<td>' + rep.email + '</td>';
+                        html += '<td><button class="danger" onclick="deleteRep(\'' + rep._id + '\')">Delete</button></td>';
+                        html += '</tr>';
+                    }
+                    html += '</table>';
+                    document.getElementById('repsList').innerHTML = html;
+                } else {
+                    document.getElementById('repsList').innerHTML = '<p>No class reps registered yet.</p>';
+                }
+            } catch (error) {
+                document.getElementById('repsList').innerHTML = '<p>Error loading class reps</p>';
+            }
+        }
+        
+        async function deleteRep(id) {
+            if (confirm('Delete this class rep?')) {
+                try {
+                    await fetch('http://localhost:5000/api/auth/class-reps/' + id, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    loadReps();
+                } catch (error) {
+                    alert('Error deleting');
+                }
+            }
+        }
+        
+        function goToDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+        
+        loadReps();
+    </script>
+</body>
+</html>

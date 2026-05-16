@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VenueChecker - University of Kabianga</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+        }
+        
+        .header p {
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .status-bar {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .loading {
+            color: #667eea;
+        }
+        
+        .venues-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .venue-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .venue-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .venue-info {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .badge.lecture_hall {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .badge.lab {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .book-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .book-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>VenueChecker - University of Kabianga</h1>
+            <p>Find and book empty lecture halls for your study sessions</p>
+        </div>
+        
+        <div class="status-bar">
+            <div id="status" class="loading">Loading venues...</div>
+        </div>
+        
+        <div id="venues" class="venues-grid"></div>
+        
+        <div class="footer">
+            <p>Class Reps: Click "Book" to request a venue for your class</p>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = 'http://localhost:5000/api/venues';
+        
+        async function loadVenues() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.success && data.data) {
+                    displayVenues(data.data);
+                    document.getElementById('status').innerHTML = '✅ ' + data.data.length + ' venues available';document.getElementById('status').innerHTML = '⚠️ No venues found';
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+        
+        function displayVenues(venues) {
+            const container = document.getElementById('venues');
+            let html = '';
+            for (let i = 0; i < venues.length; i++) {
+                const venue = venues[i];
+                html += '<div class="venue-card">';
+                html += '<h3>' + venue.name + '</h3>';
+                html += '<div class="venue-info">📍 ' + (venue.building ||  'Unknown') + ' | Floor ' + (venue.floor ||'Ground') + '</div>';
+                html += '<div class="venue-info">👥 Capacity: ' + (venue.capacity || 'N/A') + ' students</div>';
+                html += '<span class="badge ' + (venue.type || 'classroom') + '">' + (venue.type ||  'classroom') + '</span>';
+                html += '<button class="book-btn" onclick="bookVenue(\'' + venue.name + '\')">📖 Book This Venue</button>';
+                html += '</div>';
+            }
+            container.innerHTML = html;
+        }
+        
+        function bookVenue(venueName) {
+            alert('Booking request for ' + venueName + '\n\nThis feature will be added soon!');
+        }
+        
+        loadVenues();
+    </script>
+</body>
+</html>
