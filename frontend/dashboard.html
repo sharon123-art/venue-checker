@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -191,8 +191,7 @@
     <script>
         const API_BASE = 'https://venue-checker-nad3.onrender.com/api';
         const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-         if (!token) {
+        const user = JSON.parse(localStorage.getItem('user') || '{}'); if (!token) {
             window.location.href = 'login.html';
         }
         
@@ -275,7 +274,7 @@
                     
                     if (isBooker && userRole === 'class_rep') {
                         html += '<button class="btn-empty" onclick="markEmpty(\'' + v._id + '\')">✅ Mark Empty (Class Ended Early)</button>';
-                     } else {
+                    } else {
                         html += '<button disabled style="background:#ccc; cursor:not-allowed;">❌ Booked by another class rep</button>';
                     }
                     html += '</div>';
@@ -354,8 +353,7 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert('✅ Venue marked as empty!');
-                     loadVenues();
+                    alert('✅ Venue marked as empty!');loadVenues();
                 } else {
                     alert('❌ Error: ' + data.message);
                 }
