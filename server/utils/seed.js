@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 const Venue = require('../models/Venue');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+dotenv.config();
+
 const venues = [
-    
+    // BLOCK 1
     { name: "Lecture Hall 1", building: "Lecture Block 1", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 2", building: "Lecture Block 1", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 3", building: "Lecture Block 1", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -16,7 +19,7 @@ const venues = [
     { name: "Computer Lab 1", building: "Lecture Block 1", floor: "Ground", capacity: 50, type: "lab", status: "empty" },
     { name: "Science Lab 1", building: "Lecture Block 1", floor: "First", capacity: 40, type: "lab", status: "empty" },
     
-    
+    // BLOCK 2
     { name: "Lecture Hall 1", building: "Lecture Block 2", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 2", building: "Lecture Block 2", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 3", building: "Lecture Block 2", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -28,7 +31,7 @@ const venues = [
     { name: "Computer Lab 2", building: "Lecture Block 2", floor: "Ground", capacity: 50, type: "lab", status: "empty" },
     { name: "Science Lab 2", building: "Lecture Block 2", floor: "First", capacity: 40, type: "lab", status: "empty" },
     
-    
+    // BLOCK 3
     { name: "Lecture Hall 1", building: "Lecture Block 3", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 2", building: "Lecture Block 3", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 3", building: "Lecture Block 3", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -40,7 +43,7 @@ const venues = [
     { name: "Computer Lab 3", building: "Lecture Block 3", floor: "Ground", capacity: 50, type: "lab", status: "empty" },
     { name: "Science Lab 3", building: "Lecture Block 3", floor: "First", capacity: 40, type: "lab", status: "empty" },
     
-    
+    // BLOCK 4
     { name: "Lecture Hall 1", building: "Lecture Block 4", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 2", building: "Lecture Block 4", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
     { name: "Lecture Hall 3", building: "Lecture Block 4", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -55,7 +58,8 @@ const venues = [
 
 async function seed() {
     try {
-        await mongoose.connect('mongodb://localhost:27017/venue_checker');
+        await mongoose.connect(process.env.MONGODB_URI);
+        
         await Venue.deleteMany();
         await Venue.insertMany(venues);
         
