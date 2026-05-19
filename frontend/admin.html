@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -20,14 +20,12 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .card {
             background: white;
             border-radius: 10px;
             padding: 25px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h2 { margin-bottom: 20px; color: #333; }
         input {
@@ -36,7 +34,6 @@
             margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 14px;
         }
         button {
             padding: 12px 24px;
@@ -45,11 +42,8 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
         }
         button.danger { background: #e53e3e; }
-        button.danger:hover { background: #c53030; }
-        button:hover { background: #5a67d8; }
         .message {
             padding: 10px;
             border-radius: 5px;
@@ -70,19 +64,18 @@
         }
         th { background: #f5f5f5; }
         .logout { background: #e53e3e; margin-left: 10px; }
-        .back-btn { background: #718096; margin-right: 10px; }
-        .back-btn:hover { background: #5a67d8; }
+        .back-btn { background: #718096; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div>
-                <h1>👑 Admin Panel</h1>
+                <h1>Admin Panel</h1>
                 <p>Register Class Representatives</p>
             </div>
             <div>
-                <button class="back-btn" onclick="goToDashboard()">← Dashboard</button>
+                <button class="back-btn" onclick="goToDashboard()">Dashboard</button>
                 <button class="logout" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -94,7 +87,7 @@
             <input type="text" id="name" placeholder="Full Name">
             <input type="email" id="email" placeholder="Email">
             <input type="password" id="password" placeholder="Password">
-            <button onclick="registerRep()">➕ Register Class Rep</button>
+            <button onclick="registerRep()">Register Class Rep</button>
         </div>
 
         <div class="card">
@@ -106,15 +99,12 @@
     <script>
         const API_BASE = 'https://venue-checker-nad3.onrender.com/api';
         const token = localStorage.getItem('token');
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
         
         if (!token) {
             window.location.href = 'login.html';
         }
-        
-        if (user.role !== 'admin') {
-            window.location.href = 'dashboard.html';
-        } async function registerRep() {
+
+        async function registerRep() {
             const regNo = document.getElementById('regNo').value;
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
@@ -123,12 +113,12 @@
             
             if (!regNo || !name || !email || !password) {
                 messageDiv.className = 'message error';
-                messageDiv.innerHTML = '❌ Please fill all fields';
+                messageDiv.innerHTML = 'Please fill all fields';
                 return;
             }
             
             try {
-                const response = await fetch(`${API_BASE}/auth/register`, {
+                const response = await fetch(API_BASE + '/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -140,7 +130,7 @@
                 
                 if (data.success) {
                     messageDiv.className = 'message success';
-                    messageDiv.innerHTML = '✅ Class rep registered successfully!';
+                    messageDiv.innerHTML = 'Class rep registered successfully!';
                     document.getElementById('regNo').value = '';
                     document.getElementById('name').value = '';
                     document.getElementById('email').value = '';
@@ -152,46 +142,46 @@
                     }, 3000);
                 } else {
                     messageDiv.className = 'message error';
-                    messageDiv.innerHTML = '❌ ' + (data.message || 'Registration failed');
+                    messageDiv.innerHTML = data.message || 'Registration failed';
                 }
             } catch (error) {
                 messageDiv.className = 'message error';
-                messageDiv.innerHTML = '❌ Error connecting to server';
+                messageDiv.innerHTML = 'Error connecting to server';
             }
         }
         
         async function loadReps() {
             try {
-                const response = await fetch(`${API_BASE}/auth/class-reps`, {
+                const response = await fetch(API_BASE + '/auth/class-reps', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
                 const data = await response.json();
                 
                 if (data.success && data.data && data.data.length > 0) {
-                    let html = '°<table class="reps-table"><thead><tr><th>Reg No</th><th>Name</th><th>Email</th><th>Action</th></tr></thead><tbody>';
+                    let html = '<table><tr><th>Reg No</th><th>Name</th><th>Email</th><th>Action</th></tr>';
                     for (let i = 0; i < data.data.length; i++) {
                         const rep = data.data[i];
-                        html += <tr>
-                            <td>${rep.regNo}</td>
-                            <td>${rep.name}</td>
-                            <td>${rep.email}</td>
-                            <td><button class="danger" onclick="deleteRep('${rep._id}')">Delete</button></td>
-                        </tr>;
+                        html += '<tr>';
+                        html += '<td>' + rep.regNo + '</td>';
+                        html += '<td>' + rep.name + '</td>';
+                        html += '<td>' + rep.email + '</td>';
+                        html += '<td><button class="danger" onclick="deleteRep(\'' + rep._id + '\')">Delete</button></td>';
+                        html += '</tr>';
                     }
-                    html += '</tbody></table>';
+                    html += '</table>';
                     document.getElementById('repsList').innerHTML = html;
                 } else {
-                    document.getElementById('repsList').innerHTML = '<p>📭 No class reps registered yet.</p>';
+                    document.getElementById('repsList').innerHTML = '<p>No class reps registered yet.</p>';
                 }
             } catch (error) {
-                document.getElementById('repsList').innerHTML = '<p>❌ Error loading class reps</p>';
+                document.getElementById('repsList').innerHTML = '<p>Error loading class reps</p>';
             }
         }
         
         async function deleteRep(id) {
-            if (confirm('⚠️ Delete this class rep?')) {
+            if (confirm('Delete this class rep?')) {
                 try {
-                    await fetch(`${API_BASE}/auth/class-reps/${id}`, {
+                    await fetch(API_BASE + '/auth/class-reps/' + id, {
                         method: 'DELETE',
                         headers: { 'Authorization': 'Bearer ' + token }
                     });
