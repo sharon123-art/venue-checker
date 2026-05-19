@@ -1,4 +1,4 @@
-const express = require('express');
+ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
@@ -33,7 +33,7 @@ app.get('/seed', async (req, res) => {
         const bcrypt = require('bcryptjs');
 
         const venues = [
-            // ===== LECTURE BLOCK 1 =====
+            // BLOCK 1
             { name: "Lecture Hall 1", building: "Lecture Block 1", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 2", building: "Lecture Block 1", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 3", building: "Lecture Block 1", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -46,8 +46,7 @@ app.get('/seed', async (req, res) => {
             { name: "Lecture Hall 10", building: "Lecture Block 1", floor: "Fourth", capacity: 100, type: "lecture_hall", status: "empty" },
             { name: "Computer Lab 1", building: "Lecture Block 1", floor: "Ground", capacity: 50, type: "lab", status: "empty" },
             { name: "Science Lab 1", building: "Lecture Block 1", floor: "First", capacity: 40, type: "lab", status: "empty" },
-
-            // ===== LECTURE BLOCK 2 =====
+            // BLOCK 2
             { name: "Lecture Hall 1", building: "Lecture Block 2", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 2", building: "Lecture Block 2", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 3", building: "Lecture Block 2", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -56,12 +55,11 @@ app.get('/seed', async (req, res) => {
             { name: "Lecture Hall 6", building: "Lecture Block 2", floor: "Second", capacity: 150, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 7", building: "Lecture Block 2", floor: "Third", capacity: 180, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 8", building: "Lecture Block 2", floor: "Third", capacity: 120, type: "lecture_hall", status: "empty" },
-             { name: "Lecture Hall 9", building: "Lecture Block 2", floor: "Fourth", capacity: 150, type: "lecture_hall", status: "empty" },
+            { name: "Lecture Hall 9", building: "Lecture Block 2", floor: "Fourth", capacity: 150, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 10", building: "Lecture Block 2", floor: "Fourth", capacity: 100, type: "lecture_hall", status: "empty" },
             { name: "Computer Lab 2", building: "Lecture Block 2", floor: "Ground", capacity: 50, type: "lab", status: "empty" },
             { name: "Science Lab 2", building: "Lecture Block 2", floor: "First", capacity: 40, type: "lab", status: "empty" },
-
-            // ===== LECTURE BLOCK 3 =====
+            // BLOCK 3
             { name: "Lecture Hall 1", building: "Lecture Block 3", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 2", building: "Lecture Block 3", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 3", building: "Lecture Block 3", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -74,8 +72,7 @@ app.get('/seed', async (req, res) => {
             { name: "Lecture Hall 10", building: "Lecture Block 3", floor: "Fourth", capacity: 100, type: "lecture_hall", status: "empty" },
             { name: "Computer Lab 3", building: "Lecture Block 3", floor: "Ground", capacity: 50, type: "lab", status: "empty" },
             { name: "Science Lab 3", building: "Lecture Block 3", floor: "First", capacity: 40, type: "lab", status: "empty" },
-
-            // ===== LECTURE BLOCK 4 =====
+            // BLOCK 4
             { name: "Lecture Hall 1", building: "Lecture Block 4", floor: "Ground", capacity: 200, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 2", building: "Lecture Block 4", floor: "Ground", capacity: 180, type: "lecture_hall", status: "empty" },
             { name: "Lecture Hall 3", building: "Lecture Block 4", floor: "First", capacity: 200, type: "lecture_hall", status: "empty" },
@@ -104,9 +101,9 @@ app.get('/seed', async (req, res) => {
             role: 'admin'
         });
         
-        res.send('✅ Database seeded successfully! 48 venues and admin user created.');
+        res.send('✅ Database seeded successfully! 48 venues and admin created.');
     } catch (error) {
-        res.send('❌ Error seeding database: ' + error.message);
+        res.send('❌ Error: ' + error.message);
     }
 });
 // ===== END TEMPORARY SEED ROUTE =====
